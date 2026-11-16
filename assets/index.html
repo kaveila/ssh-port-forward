@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <title>SSH Port Forward</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7 7.5h6.5a3.5 3.5 0 0 1 0 7H10m7-7-3-3m3 3-3 3M17 16.5H10.5a3.5 3.5 0 0 1 0-7H14m-7 7 3-3m-3 3 3 3"/></svg>
+        </div>
+        <div>
+          <h1>SSH Port Forward</h1>
+          <p>轻点 Host，管理端口通道</p>
+        </div>
+      </div>
+      <button class="icon-button no-drag" id="refreshButton" type="button" title="刷新" aria-label="刷新">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.34 5.66M20 5v6h-6"/></svg>
+      </button>
+    </header>
+
+    <section class="summary">
+      <div class="summary-copy">
+        <span class="eyebrow">SSH CONFIG</span>
+        <p class="config-path" id="configPath">正在读取…</p>
+      </div>
+      <div class="summary-count">
+        <strong id="hostCount">0</strong>
+        <span>HOSTS</span>
+      </div>
+    </section>
+
+    <div class="notice" id="notice" hidden></div>
+
+    <label class="search no-drag">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+      <input id="searchInput" type="search" placeholder="搜索 Host" autocomplete="off" spellcheck="false">
+      <kbd id="searchCount"></kbd>
+    </label>
+
+    <section class="host-list" id="hostList" aria-live="polite">
+      <div class="loading-state">
+        <span class="spinner"></span>
+        <p>正在读取 SSH 配置</p>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span><i class="light running"></i> 正在转发</span>
+      <span><i class="light idle"></i> 未转发</span>
+      <span class="footer-hint">右键托盘可退出</span>
+    </footer>
+  </main>
+
+  <section class="detail-layer" id="detailLayer" hidden aria-modal="true" role="dialog" aria-labelledby="detailTitle">
+    <div class="detail-card">
+      <header class="detail-header">
+        <button class="back-button no-drag" id="backButton" type="button" aria-label="返回">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <div class="detail-heading">
+          <span class="eyebrow" id="detailStatus">HOST DETAIL</span>
+          <h2 id="detailTitle"></h2>
+          <p id="detailAddress"></p>
+        </div>
+        <span class="light large" id="detailLight" aria-hidden="true"></span>
+      </header>
+
+      <div class="detail-scroll">
+        <section class="forward-section">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">ACTIVE TUNNELS</span>
+              <h3>端口转发</h3>
+            </div>
+            <span class="pill" id="forwardCount">0 条</span>
+          </div>
+          <div class="forward-list" id="forwardList"></div>
+        </section>
+
+        <section class="add-section">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">NEW FORWARD</span>
+              <h3>新增端口转发</h3>
+            </div>
+          </div>
+
+          <form id="forwardForm" class="forward-form">
+            <label class="field full">
+              <span>转发类型</span>
+              <select id="kind" name="kind">
+                <option value="local">本地转发 · Local</option>
+                <option value="remote">远端转发 · Remote</option>
+                <option value="dynamic">动态代理 · SOCKS5</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span id="bindLabel">监听地址</span>
+              <input id="bindAddress" name="bindAddress" value="127.0.0.1" autocomplete="off" spellcheck="false">
+            </label>
+
+            <label class="field">
+              <span id="localPortLabel">本地端口</span>
+              <input id="localPort" name="localPort" type="number" min="1" max="65535" placeholder="8080" required>
+            </label>
+
+            <label class="field remote-field">
+              <span>目标地址</span>
+              <input id="remoteHost" name="remoteHost" placeholder="127.0.0.1" autocomplete="off" spellcheck="false">
+            </label>
+
+            <label class="field remote-field">
+              <span>目标端口</span>
+              <input id="remotePort" name="remotePort" type="number" min="1" max="65535" placeholder="80">
+            </label>
+
+            <div class="form-options full">
+              <label class="check">
+                <input id="autoStart" type="checkbox" checked>
+                <span>应用启动时自动转发</span>
+              </label>
+              <label class="check">
+                <input id="startNow" type="checkbox" checked>
+                <span>保存后立即启动</span>
+              </label>
+            </div>
+
+            <button class="primary-button full no-drag" id="submitButton" type="submit">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+              <span>保存端口转发</span>
+            </button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
